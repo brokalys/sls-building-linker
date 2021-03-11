@@ -1,0 +1,89 @@
+service: brokalys-building-linker
+useDotenv: true
+
+package:
+  individually: true
+  exclude:
+    - '**/*'
+  include:
+    - src/shared/**
+    - '!src/shared/*.test.js'
+    - '!**/__mocks__/**'
+    - '!**/__snapshots__/**'
+
+provider:
+  name: aws
+  region: eu-west-1
+  runtime: nodejs14.x
+  logRetentionInDays: 7
+  versionFunctions: false
+  stage: ${opt:stage, 'dev'}
+  tags:
+    group: building-linker
+  environment:
+    STAGE: ${self:provider.stage}
+    DB_HOST: ${env:DB_HOST}
+    DB_DATABASE: ${env:DB_DATABASE}
+    DB_USERNAME: ${env:DB_USERNAME}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+
+functions:
+  process-queue:
+    name: BrokalysBuildingLinker-ProcessSqs-${self:provider.stage}
+    description: Process the queue - link the properties to specific buildings
+    reservedConcurrency: 4
+    timeout: 1
+    handler: src/process-queue.run
+    package:
+      include:
+        - src/process-queue.js
+        - src/test/process-queue.json
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - BuildingLinkerQueue
+              - Arn
+          batchSize: 10
+
+custom:
+  serverless-layers:
+    packageManager: yarn
+    dependenciesPath: ./package.json
+    layersDeploymentBucket: ${self:provider.stage}-brokalys-lambda-layers
+    customInstallationCommand: yarn install --production --ignore-scripts
+
+plugins:
+  - serverless-layers
+
+resources:
+  Resources:
+    BuildingLinkerQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stage}-building-linker.fifo
+        FifoQueue: true
+    BuildingLinkerQueuePolicy:
+      Type: AWS::SQS::QueuePolicy
+      Properties:
+        PolicyDocument:
+          Statement:
+            - Sid: Allow-SNS-SendMessage
+              Effect: Allow
+              Principal:
+                AWS: '*'
+              Resource: !GetAtt BuildingLinkerQueue.Arn
+              Action:
+                - SQS:SendMessage
+              Condition:
+                ArnEquals:
+                  aws:SourceArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
+        Queues:
+          - !Ref BuildingLinkerQueue
+    NewPropertySubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: !GetAtt BuildingLinkerQueue.Arn
+        Protocol: sqs
+        TopicArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
+        RawMessageDelivery: true
