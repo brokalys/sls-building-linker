@@ -5,7 +5,13 @@ exports.run = async (event) => {
 
   await Promise.all(
     properties
-      .filter((property) => property.lat && property.lng)
+      .filter(
+        (property) =>
+          property.lat &&
+          property.lng &&
+          (!property.location_country ||
+            property.location_country === 'Latvia'),
+      )
       .map(async (property) => {
         const buildingId = await db.findBuildingId(property.lat, property.lng);
 

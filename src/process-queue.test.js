@@ -26,6 +26,19 @@ describe('process-queue', () => {
     expect(db.updatePropertyBuildingId).not.toBeCalled();
   });
 
+  test('ignores properties outside of Latvia', async () => {
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({ lat: 1, lng: 2, location_country: 'Estonia' }),
+        },
+      ],
+    });
+
+    expect(db.findBuildingId).not.toBeCalled();
+    expect(db.updatePropertyBuildingId).not.toBeCalled();
+  });
+
   test('works for multiple properties', async () => {
     db.findBuildingId.mockResolvedValueOnce(111);
 
