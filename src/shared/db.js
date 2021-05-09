@@ -22,11 +22,11 @@ function updatePropertyBuildingId(propertyId, buildingId) {
   });
 }
 
-async function findBuildingId(lat, lng) {
+async function findBuildingIdByLatLng(lat, lng) {
   const distance = 0.0005;
   const data = await mysql.query({
     sql: `
-      Select id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
+      SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
       FROM buildings
       WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
       ORDER BY distance ASC
@@ -47,7 +47,27 @@ async function findBuildingId(lat, lng) {
   }
 }
 
+async function findBuildingIdByLocation({ city, street, housenumber }) {
+  const data = await mysql.query({
+    sql: `
+      SELECT id
+      FROM buildings
+      WHERE city = ?
+        AND street = ?
+        AND housenumber = ?
+      ORDER BY id ASC
+      LIMIT 1
+   `,
+    values: [city, street, housenumber],
+  });
+
+  if (data.length > 0) {
+    return data[0].id;
+  }
+}
+
 module.exports = {
   updatePropertyBuildingId,
-  findBuildingId,
+  findBuildingIdByLatLng,
+  findBuildingIdByLocation,
 };

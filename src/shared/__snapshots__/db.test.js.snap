@@ -1,9 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`findBuildingId constructs the correct query 1`] = `
+exports[`findBuildingIdByLatLng constructs the correct query 1`] = `
 Object {
   "sql": "
-      Select id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
+      SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
       FROM buildings
       WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
       ORDER BY distance ASC

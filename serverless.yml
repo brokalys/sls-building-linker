@@ -3,9 +3,8 @@ useDotenv: true
 
 package:
   individually: true
-  exclude:
-    - '**/*'
-  include:
+  patterns:
+    - '!**/*'
     - src/shared/**
     - '!src/shared/*.test.js'
     - '!**/__mocks__/**'
@@ -35,7 +34,7 @@ functions:
     timeout: 1
     handler: src/process-queue.run
     package:
-      include:
+      patterns:
         - src/process-queue.js
         - src/test/process-queue.json
     events:
