@@ -18,7 +18,9 @@ function parser(data) {
 
 function normalizer(data) {
   const houseNumber = getHouseNumber(data.location_address || '');
-  const houseNumRegex = new RegExp(` ${houseNumber}$`);
+  const houseNumRegex = new RegExp(
+    ` ${(houseNumber || '').replace(/[^a-zA-Z0-9_-]/g, '.')}$`,
+  );
 
   let district = normalizeString(data.location_district, true, 21);
   let parish = normalizeString(data.location_parish, true);

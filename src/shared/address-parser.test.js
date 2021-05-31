@@ -218,6 +218,18 @@ describe('parser', () => {
         housenumber: '5 5 a',
       },
     ],
+    [
+      {
+        location_district: 'Jūrmala',
+        location_parish: null,
+        location_address: 'Babītes iela 1**',
+      },
+      {
+        city: 'jurmala',
+        street: 'babites',
+        housenumber: '1',
+      },
+    ],
     // [
     //   {
     //     location_district: 'Rīgas rajons',
