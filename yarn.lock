@@ -309,6 +309,13 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@brokalys/address-normalization@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@brokalys/address-normalization/-/address-normalization-1.0.0.tgz#686ee282180aa4b3511619d7dc4487725f4185f5"
+  integrity sha512-w0/UC/eJ+BzGgvd+BZado5U582n1aplGXv3uXXwnMYAwMzNKwK3uulyWl81KHF+pHnFyEz0Mdb0C+pNVWoyMWg==
+  dependencies:
+    diacritics "^1.3.0"
+
 "@cloudcmd/copy-file@^1.1.0":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@cloudcmd/copy-file/-/copy-file-1.1.1.tgz#59749cb865c7bbc748a5642b21b089704e699121"

@@ -1,5 +1,5 @@
+const addressParser = require('@brokalys/address-normalization');
 const db = require('./shared/db');
-const addressParser = require('./shared/address-parser');
 
 exports.run = async (event) => {
   const classifieds = event.Records.map((row) => JSON.parse(row.body));
