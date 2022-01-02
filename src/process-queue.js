@@ -32,7 +32,8 @@ exports.run = async (event) => {
           classified.lat &&
           classified.lng &&
           (!classified.location_country ||
-            classified.location_country === 'Latvia'),
+            classified.location_country === 'Latvia') &&
+          classified.category !== 'land',
       )
       .map(async (classified) => {
         const buildingId = await db.findBuildingIdByLatLng(

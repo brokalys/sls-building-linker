@@ -64,6 +64,19 @@ describe('process-queue', () => {
     expect(db.updatePropertyBuildingId).not.toBeCalled();
   });
 
+  test('ignores LAND properties', async () => {
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({ lat: 1, lng: 2, category: 'land' }),
+        },
+      ],
+    });
+
+    expect(db.findBuildingIdByLatLng).not.toBeCalled();
+    expect(db.updatePropertyBuildingId).not.toBeCalled();
+  });
+
   test('works for multiple properties', async () => {
     db.findBuildingIdByLatLng.mockResolvedValueOnce(111);
 
