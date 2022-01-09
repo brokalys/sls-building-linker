@@ -19,10 +19,11 @@ yarn install
 
 ## Development
 
-Start a local development server.
+Run the function locally with local test data.
 
 ```sh
-yarn start
+yarn sls invoke local -f process-queue -p src/test/process-queue.json
+yarn sls invoke local -f process-vzd-queue -p src/test/process-vzd-queue.json
 ```
 
 ## Deployment

@@ -44,6 +44,23 @@ functions:
               - BuildingLinkerQueue
               - Arn
           batchSize: 10
+  process-vzd-queue:
+    name: BrokalysVZDBuildingLinker-ProcessSqs-${self:provider.stage}
+    description: Process the VZD queue - link the properties to specific buildings
+    reservedConcurrency: 4
+    timeout: 1
+    handler: src/process-vzd-queue.run
+    package:
+      patterns:
+        - src/process-vzd-queue.js
+        - src/test/process-vzd-queue.json
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - VZDBuildingLinkerQueue
+              - Arn
+          batchSize: 10
 
 custom:
   serverless-layers:
@@ -77,12 +94,36 @@ resources:
               Condition:
                 ArnEquals:
                   aws:SourceArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
+            - Sid: Allow-SNS-SendMessage
+              Effect: Allow
+              Principal:
+                AWS: '*'
+              Resource: !GetAtt VZDBuildingLinkerQueue.Arn
+              Action:
+                - SQS:SendMessage
+              Condition:
+                ArnEquals:
+                  aws:SourceArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
         Queues:
           - !Ref BuildingLinkerQueue
+          - !Ref VZDBuildingLinkerQueue
     NewPropertySubscription:
       Type: AWS::SNS::Subscription
       Properties:
         Endpoint: !GetAtt BuildingLinkerQueue.Arn
+        Protocol: sqs
+        TopicArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
+        RawMessageDelivery: true
+
+    VZDBuildingLinkerQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stage}-vzd-building-linker.fifo
+        FifoQueue: true
+    VZDNewPropertySubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: !GetAtt VZDBuildingLinkerQueue.Arn
         Protocol: sqs
         TopicArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
         RawMessageDelivery: true

@@ -6,7 +6,7 @@ jest.mock('./shared/db');
 describe('process-queue', () => {
   afterEach(jest.clearAllMocks);
 
-  test.only('updates the building id if a address match is found', async () => {
+  test('updates the building id if a address match is found', async () => {
     db.findBuildingIdByLocation.mockResolvedValueOnce(111);
 
     await run({
