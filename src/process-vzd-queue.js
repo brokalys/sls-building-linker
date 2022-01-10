@@ -13,7 +13,7 @@ exports.run = async (event) => {
           classified.lng &&
           (!classified.location_country ||
             classified.location_country === 'Latvia') &&
-          ['apartment', 'house'].includes(classified.category),
+          ['apartment', 'house', 'office'].includes(classified.category),
       )
       .map(async (classified) => {
         const buildingId = await db.findVzdBuildingIdByLatLng(
