@@ -3,33 +3,53 @@ const db = require('./shared/db');
 
 exports.run = async (event) => {
   const classifieds = event.Records.map((row) => JSON.parse(row.body));
+  const eligibleClassifieds = classifieds.filter(
+    (classified) =>
+      (!classified.location_country ||
+        classified.location_country === 'Latvia') &&
+      ['apartment', 'house', 'office'].includes(classified.category),
+  );
+
+  // Link by address
+  await Promise.all(
+    eligibleClassifieds.map(async (classified) => {
+      const location = addressParser(classified);
+
+      if (!location.city || !location.street || !location.housenumber) {
+        return;
+      }
+
+      const buildingId = await db.findVzdBuildingIdByLocation(location);
+
+      if (!buildingId) {
+        return;
+      }
+
+      return db.createPropertyBuildingLink(
+        classified.id,
+        buildingId,
+        'address',
+      );
+    }),
+  );
 
   // Link by lat/lng
   await Promise.all(
-    classifieds
-      .filter(
-        (classified) =>
-          classified.lat &&
-          classified.lng &&
-          (!classified.location_country ||
-            classified.location_country === 'Latvia') &&
-          ['apartment', 'house', 'office'].includes(classified.category),
-      )
-      .map(async (classified) => {
-        const buildingId = await db.findVzdBuildingIdByLatLng(
-          classified.lat,
-          classified.lng,
-        );
+    eligibleClassifieds.map(async (classified) => {
+      if (!classified.lat || !classified.lng) {
+        return;
+      }
 
-        if (!buildingId) {
-          return;
-        }
+      const buildingId = await db.findVzdBuildingIdByLatLng(
+        classified.lat,
+        classified.lng,
+      );
 
-        return db.createPropertyBuildingLink(
-          classified.id,
-          buildingId,
-          'latlng',
-        );
-      }),
+      if (!buildingId) {
+        return;
+      }
+
+      return db.createPropertyBuildingLink(classified.id, buildingId, 'latlng');
+    }),
   );
 };

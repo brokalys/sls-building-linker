@@ -54,6 +54,25 @@ Object {
 }
 `;
 
+exports[`findVzdBuildingIdByLocation constructs the correct query 1`] = `
+Object {
+  "sql": "
+      SELECT id
+      FROM vzd_buildings
+      WHERE city = ?
+        AND street = ?
+        AND house_number = ?
+      ORDER BY id ASC
+      LIMIT 1
+   ",
+  "values": Array [
+    "riga",
+    "brivibas",
+    "12",
+  ],
+}
+`;
+
 exports[`updatePropertyBuildingId constructs the correct query 1`] = `
 Object {
   "sql": "

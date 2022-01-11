@@ -6,6 +6,52 @@ jest.mock('./shared/db');
 describe('process-vzd-queue', () => {
   afterEach(jest.clearAllMocks);
 
+  test('creates the building id if a address match is found', async () => {
+    db.findVzdBuildingIdByLocation.mockResolvedValueOnce(111);
+
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'apartment',
+            location_district: 'Rīga',
+            location_address: 'Brīvības iela 14',
+          }),
+        },
+      ],
+    });
+
+    expect(db.findVzdBuildingIdByLocation).toBeCalledWith(
+      expect.objectContaining({
+        city: 'riga',
+        street: 'brivibas',
+        housenumber: '14',
+      }),
+    );
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(1);
+  });
+
+  test('creates the building id and latlng link if both matched', async () => {
+    db.findVzdBuildingIdByLocation.mockResolvedValueOnce(111);
+    db.findVzdBuildingIdByLatLng.mockResolvedValueOnce(111);
+
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'apartment',
+            lat: 1,
+            lng: 2,
+            location_district: 'Rīga',
+            location_address: 'Brīvības iela 14',
+          }),
+        },
+      ],
+    });
+
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(2);
+  });
+
   test('updates the building id if a lat/lng match is found', async () => {
     db.findVzdBuildingIdByLatLng.mockResolvedValueOnce(111);
 
@@ -16,7 +62,7 @@ describe('process-vzd-queue', () => {
     });
 
     expect(db.findVzdBuildingIdByLatLng).toBeCalledWith(1, 2);
-    expect(db.createPropertyBuildingLink).toBeCalled();
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(1);
   });
 
   test('ignores properties with no lat/lng building matches', async () => {

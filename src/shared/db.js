@@ -105,10 +105,30 @@ async function findBuildingIdByLocation({ city, street, housenumber }) {
   }
 }
 
+async function findVzdBuildingIdByLocation({ city, street, housenumber }) {
+  const data = await mysql.query({
+    sql: `
+      SELECT id
+      FROM vzd_buildings
+      WHERE city = ?
+        AND street = ?
+        AND house_number = ?
+      ORDER BY id ASC
+      LIMIT 1
+   `,
+    values: [city, street, housenumber],
+  });
+
+  if (data.length > 0) {
+    return data[0].id;
+  }
+}
+
 module.exports = {
   updatePropertyBuildingId,
   createPropertyBuildingLink,
   findBuildingIdByLatLng,
   findBuildingIdByLocation,
   findVzdBuildingIdByLatLng,
+  findVzdBuildingIdByLocation,
 };

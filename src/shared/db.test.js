@@ -78,3 +78,42 @@ describe('findVzdBuildingIdByLatLng', () => {
     expect(output).toBe(333);
   });
 });
+
+describe('findVzdBuildingIdByLocation', () => {
+  afterEach(jest.clearAllMocks);
+
+  test('constructs the correct query', () => {
+    db.findVzdBuildingIdByLocation({
+      city: 'riga',
+      street: 'brivibas',
+      housenumber: '12',
+    });
+
+    expect(query).toBeCalled();
+    expect(query.mock.calls[0][0]).toMatchSnapshot();
+  });
+
+  test('returns nothing if nothing found', async () => {
+    query.mockResolvedValueOnce([]);
+
+    const output = await db.findVzdBuildingIdByLocation({
+      city: 'riga',
+      street: 'brivibas',
+      housenumber: '12',
+    });
+
+    expect(output).toBeUndefined();
+  });
+
+  test('returns the row id if something is found', async () => {
+    query.mockResolvedValueOnce([{ id: 333 }]);
+
+    const output = await db.findVzdBuildingIdByLocation({
+      city: 'riga',
+      street: 'brivibas',
+      housenumber: '12',
+    });
+
+    expect(output).toBe(333);
+  });
+});
