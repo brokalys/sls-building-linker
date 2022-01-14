@@ -46,9 +46,10 @@ functions:
           batchSize: 10
   process-vzd-queue:
     name: BrokalysVZDBuildingLinker-ProcessSqs-${self:provider.stage}
-    description: Process the VZD queue - link the properties to specific buildings
+    description:
+      Process the VZD queue - link the properties to specific buildings
     reservedConcurrency: 4
-    timeout: 2
+    timeout: 1
     handler: src/process-vzd-queue.run
     package:
       patterns:
