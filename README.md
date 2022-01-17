@@ -22,7 +22,6 @@ yarn install
 Run the function locally with local test data.
 
 ```sh
-yarn sls invoke local -f process-queue -p src/test/process-queue.json
 yarn sls invoke local -f process-vzd-queue -p src/test/process-vzd-queue.json
 ```
 

@@ -14,26 +14,6 @@ Object {
 }
 `;
 
-exports[`findBuildingIdByLatLng constructs the correct query 1`] = `
-Object {
-  "sql": "
-      SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
-      FROM buildings
-      WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
-      ORDER BY distance ASC
-      LIMIT 1
-   ",
-  "values": Array [
-    56.123,
-    24.222,
-    56.122499999999995,
-    24.221500000000002,
-    56.1235,
-    24.2225,
-  ],
-}
-`;
-
 exports[`findVzdBuildingIdByLatLng constructs the correct query 1`] = `
 Object {
   "sql": "
@@ -69,20 +49,6 @@ Object {
     "riga",
     "brivibas",
     "12",
-  ],
-}
-`;
-
-exports[`updatePropertyBuildingId constructs the correct query 1`] = `
-Object {
-  "sql": "
-      UPDATE properties
-      SET building_id = ?
-      WHERE id = ?
-   ",
-  "values": Array [
-    222,
-    111,
   ],
 }
 `;

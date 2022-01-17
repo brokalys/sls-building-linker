@@ -27,23 +27,6 @@ provider:
     DB_PASSWORD: ${env:DB_PASSWORD}
 
 functions:
-  process-queue:
-    name: BrokalysBuildingLinker-ProcessSqs-${self:provider.stage}
-    description: Process the queue - link the properties to specific buildings
-    reservedConcurrency: 4
-    timeout: 1
-    handler: src/process-queue.run
-    package:
-      patterns:
-        - src/process-queue.js
-        - src/test/process-queue.json
-    events:
-      - sqs:
-          arn:
-            Fn::GetAtt:
-              - BuildingLinkerQueue
-              - Arn
-          batchSize: 10
   process-vzd-queue:
     name: BrokalysVZDBuildingLinker-ProcessSqs-${self:provider.stage}
     description:
@@ -75,26 +58,11 @@ plugins:
 
 resources:
   Resources:
-    BuildingLinkerQueue:
-      Type: AWS::SQS::Queue
-      Properties:
-        QueueName: ${self:provider.stage}-building-linker.fifo
-        FifoQueue: true
     BuildingLinkerQueuePolicy:
       Type: AWS::SQS::QueuePolicy
       Properties:
         PolicyDocument:
           Statement:
-            - Sid: Allow-SNS-SendMessage
-              Effect: Allow
-              Principal:
-                AWS: '*'
-              Resource: !GetAtt BuildingLinkerQueue.Arn
-              Action:
-                - SQS:SendMessage
-              Condition:
-                ArnEquals:
-                  aws:SourceArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
             - Sid: Allow-SNS-SendMessage
               Effect: Allow
               Principal:
@@ -106,15 +74,7 @@ resources:
                 ArnEquals:
                   aws:SourceArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
         Queues:
-          - !Ref BuildingLinkerQueue
           - !Ref VZDBuildingLinkerQueue
-    NewPropertySubscription:
-      Type: AWS::SNS::Subscription
-      Properties:
-        Endpoint: !GetAtt BuildingLinkerQueue.Arn
-        Protocol: sqs
-        TopicArn: !ImportValue PropertyCreationTopic-Arn-${self:provider.stage}
-        RawMessageDelivery: true
 
     VZDBuildingLinkerQueue:
       Type: AWS::SQS::Queue
