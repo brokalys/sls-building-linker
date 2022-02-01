@@ -3,7 +3,7 @@
 exports[`createPropertyBuildingLink constructs the correct query 1`] = `
 Object {
   "sql": "
-      INSERT INTO property_building_links
+      REPLACE INTO property_building_links
       SET ?
    ",
   "values": Object {

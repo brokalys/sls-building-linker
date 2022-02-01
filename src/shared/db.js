@@ -14,7 +14,7 @@ const mysql = serverlessMysql({
 function createPropertyBuildingLink(propertyId, buildingId, linkType) {
   return mysql.query({
     sql: `
-      INSERT INTO property_building_links
+      REPLACE INTO property_building_links
       SET ?
    `,
     values: {
