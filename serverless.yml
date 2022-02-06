@@ -81,6 +81,14 @@ resources:
       Properties:
         QueueName: ${self:provider.stage}-vzd-building-linker.fifo
         FifoQueue: true
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt VZDBuildingLinkerDeadLetterQueue.Arn
+          maxReceiveCount: 3
+    VZDBuildingLinkerDeadLetterQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${self:provider.stage}-vzd-building-linker-dlq.fifo
+        FifoQueue: true
     VZDNewPropertySubscription:
       Type: AWS::SNS::Subscription
       Properties:
