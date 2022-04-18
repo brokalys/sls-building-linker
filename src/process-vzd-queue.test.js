@@ -31,7 +31,7 @@ describe('process-vzd-queue', () => {
     expect(db.createPropertyBuildingLink).toBeCalledTimes(1);
   });
 
-  test('creates the building id and latlng link if both matched', async () => {
+  test('creates the building id and latlng link if both matched for category = "apartment"', async () => {
     db.findVzdBuildingIdByLocation.mockResolvedValueOnce(111);
     db.findVzdBuildingIdByLatLng.mockResolvedValueOnce(111);
 
@@ -50,6 +50,26 @@ describe('process-vzd-queue', () => {
     });
 
     expect(db.createPropertyBuildingLink).toBeCalledTimes(2);
+  });
+
+  test('creates the plot id and latlng link if lat/lng match found for category = "land"', async () => {
+    db.findVzdPlotIdByLatLng.mockResolvedValueOnce(222);
+
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'land',
+            lat: 1,
+            lng: 2,
+            location_district: 'Rīga',
+            location_address: 'Brīvības iela 14',
+          }),
+        },
+      ],
+    });
+
+    expect(db.createPropertyPlotLink).toBeCalledTimes(1);
   });
 
   test('updates the building id if a lat/lng match is found', async () => {

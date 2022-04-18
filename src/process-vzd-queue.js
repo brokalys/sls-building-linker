@@ -52,4 +52,28 @@ exports.run = async (event) => {
       return db.createPropertyBuildingLink(classified.id, buildingId, 'latlng');
     }),
   );
+
+  // Link "land" classifieds by lat/lng
+  await Promise.all(
+    classifieds
+      .filter(
+        (classified) =>
+          (!classified.location_country ||
+            classified.location_country === 'Latvia') &&
+          classified.category === 'land',
+      )
+      .filter((classified) => !!classified.lat && !!classified.lng)
+      .map(async (classified) => {
+        const plotId = await db.findVzdPlotIdByLatLng(
+          classified.lat,
+          classified.lng,
+        );
+
+        if (!plotId) {
+          return;
+        }
+
+        return db.createPropertyPlotLink(classified.id, plotId, 'latlng');
+      }),
+  );
 };
