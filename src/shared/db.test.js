@@ -14,11 +14,11 @@ describe('createPropertyBuildingLink', () => {
   });
 });
 
-describe('createPropertyPlotLink', () => {
+describe('createPropertyLandLink', () => {
   afterEach(jest.clearAllMocks);
 
   test('constructs the correct query', () => {
-    db.createPropertyPlotLink(111, 222, 'latlng');
+    db.createPropertyLandLink(111, 222, 'latlng');
 
     expect(query).toBeCalled();
     expect(query.mock.calls[0][0]).toMatchSnapshot();
@@ -52,11 +52,11 @@ describe('findVzdBuildingIdByLatLng', () => {
   });
 });
 
-describe('findVzdPlotIdByLatLng', () => {
+describe('findVzdLandIdByLatLng', () => {
   afterEach(jest.clearAllMocks);
 
   test('constructs the correct query', () => {
-    db.findVzdPlotIdByLatLng(56.123, 24.222);
+    db.findVzdLandIdByLatLng(56.123, 24.222);
 
     expect(query).toBeCalled();
     expect(query.mock.calls[0][0]).toMatchSnapshot();
@@ -65,7 +65,7 @@ describe('findVzdPlotIdByLatLng', () => {
   test('returns nothing if nothing found', async () => {
     query.mockResolvedValueOnce([]);
 
-    const output = await db.findVzdPlotIdByLatLng(56.123, 24.222);
+    const output = await db.findVzdLandIdByLatLng(56.123, 24.222);
 
     expect(output).toBeUndefined();
   });
@@ -73,7 +73,7 @@ describe('findVzdPlotIdByLatLng', () => {
   test('returns the row id if something is found', async () => {
     query.mockResolvedValueOnce([{ id: 333 }]);
 
-    const output = await db.findVzdPlotIdByLatLng(56.123, 24.222);
+    const output = await db.findVzdLandIdByLatLng(56.123, 24.222);
 
     expect(output).toBe(333);
   });

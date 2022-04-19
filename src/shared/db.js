@@ -25,14 +25,14 @@ function createPropertyBuildingLink(propertyId, buildingId, linkType) {
   });
 }
 
-function createPropertyPlotLink(propertyId, plotId, linkType) {
+function createPropertyLandLink(propertyId, landId, linkType) {
   return mysql.query({
     sql: `
-      REPLACE INTO property_plot_links
+      REPLACE INTO property_land_links
       SET ?
    `,
     values: {
-      vzd_plot_id: plotId,
+      vzd_land_id: landId,
       property_id: propertyId,
       link_type: linkType,
     },
@@ -64,12 +64,12 @@ async function findVzdBuildingIdByLatLng(lat, lng) {
   }
 }
 
-async function findVzdPlotIdByLatLng(lat, lng) {
+async function findVzdLandIdByLatLng(lat, lng) {
   const distance = 0.0005;
   const data = await mysql.query({
     sql: `
       SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
-      FROM vzd_plots
+      FROM vzd_land
       WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
       ORDER BY distance ASC
       LIMIT 1
@@ -110,8 +110,8 @@ async function findVzdBuildingIdByLocation({ city, street, housenumber }) {
 
 module.exports = {
   createPropertyBuildingLink,
-  createPropertyPlotLink,
-  findVzdPlotIdByLatLng,
+  createPropertyLandLink,
+  findVzdLandIdByLatLng,
   findVzdBuildingIdByLatLng,
   findVzdBuildingIdByLocation,
 };

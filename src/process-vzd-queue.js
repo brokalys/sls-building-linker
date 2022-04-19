@@ -64,16 +64,16 @@ exports.run = async (event) => {
       )
       .filter((classified) => !!classified.lat && !!classified.lng)
       .map(async (classified) => {
-        const plotId = await db.findVzdPlotIdByLatLng(
+        const landId = await db.findVzdLandIdByLatLng(
           classified.lat,
           classified.lng,
         );
 
-        if (!plotId) {
+        if (!landId) {
           return;
         }
 
-        return db.createPropertyPlotLink(classified.id, plotId, 'latlng');
+        return db.createPropertyLandLink(classified.id, landId, 'latlng');
       }),
   );
 };

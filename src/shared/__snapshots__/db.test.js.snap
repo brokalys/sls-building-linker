@@ -14,16 +14,16 @@ Object {
 }
 `;
 
-exports[`createPropertyPlotLink constructs the correct query 1`] = `
+exports[`createPropertyLandLink constructs the correct query 1`] = `
 Object {
   "sql": "
-      REPLACE INTO property_plot_links
+      REPLACE INTO property_land_links
       SET ?
    ",
   "values": Object {
     "link_type": "latlng",
     "property_id": 111,
-    "vzd_plot_id": 222,
+    "vzd_land_id": 222,
   },
 }
 `;
@@ -67,11 +67,11 @@ Object {
 }
 `;
 
-exports[`findVzdPlotIdByLatLng constructs the correct query 1`] = `
+exports[`findVzdLandIdByLatLng constructs the correct query 1`] = `
 Object {
   "sql": "
       SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
-      FROM vzd_plots
+      FROM vzd_land
       WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
       ORDER BY distance ASC
       LIMIT 1

@@ -52,8 +52,8 @@ describe('process-vzd-queue', () => {
     expect(db.createPropertyBuildingLink).toBeCalledTimes(2);
   });
 
-  test('creates the plot id and latlng link if lat/lng match found for category = "land"', async () => {
-    db.findVzdPlotIdByLatLng.mockResolvedValueOnce(222);
+  test('creates the land id and latlng link if lat/lng match found for category = "land"', async () => {
+    db.findVzdLandIdByLatLng.mockResolvedValueOnce(222);
 
     await run({
       Records: [
@@ -69,7 +69,7 @@ describe('process-vzd-queue', () => {
       ],
     });
 
-    expect(db.createPropertyPlotLink).toBeCalledTimes(1);
+    expect(db.createPropertyLandLink).toBeCalledTimes(1);
   });
 
   test('updates the building id if a lat/lng match is found', async () => {
