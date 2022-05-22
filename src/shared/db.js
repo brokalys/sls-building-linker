@@ -71,6 +71,7 @@ async function findVzdLandIdByLatLng(lat, lng) {
       SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
       FROM vzd_land
       WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
+      AND is_usable = 1
       ORDER BY distance ASC
       LIMIT 1
    `,
