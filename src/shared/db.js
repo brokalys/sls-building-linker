@@ -46,6 +46,7 @@ async function findVzdBuildingIdByLatLng(lat, lng) {
       SELECT id, ST_DISTANCE(bounds, POINT(?, ?)) as distance
       FROM vzd_buildings
       WHERE MBRIntersects(bounds, LineString(Point(?, ?), Point(?, ?)))
+      AND is_usable = 1
       ORDER BY distance ASC
       LIMIT 1
    `,
@@ -95,7 +96,8 @@ async function findVzdBuildingIdByLocation({ city, street, housenumber }) {
     sql: `
       SELECT id
       FROM vzd_buildings
-      WHERE city = ?
+      WHERE is_usable = 1
+        AND city = ?
         AND street = ?
         AND house_number = ?
       ORDER BY id ASC
