@@ -127,6 +127,19 @@ describe('process-vzd-queue', () => {
     expect(db.createPropertyBuildingLink).not.toBeCalled();
   });
 
+  test('ignores property in specific ignored coords', async () => {
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({ lat: 56, lng: 24, category: 'apartment' }),
+        },
+      ],
+    });
+
+    expect(db.findVzdBuildingIdByLatLng).not.toBeCalled();
+    expect(db.createPropertyBuildingLink).not.toBeCalled();
+  });
+
   test('works for multiple properties', async () => {
     db.findVzdBuildingIdByLatLng.mockResolvedValueOnce(111);
 
