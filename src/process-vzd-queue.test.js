@@ -191,24 +191,6 @@ describe('process-vzd-queue', () => {
     expect(db.createPropertyBuildingLink).not.toBeCalled();
   });
 
-  test('ignores properties outside of Latvia', async () => {
-    await run({
-      Records: [
-        {
-          body: JSON.stringify({
-            lat: 1,
-            lng: 2,
-            category: 'apartment',
-            location_country: 'Estonia',
-          }),
-        },
-      ],
-    });
-
-    expect(db.findVzdBuildingIdByLatLng).not.toBeCalled();
-    expect(db.createPropertyBuildingLink).not.toBeCalled();
-  });
-
   test('ignores LAND properties', async () => {
     await run({
       Records: [

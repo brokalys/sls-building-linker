@@ -16,11 +16,8 @@ function isIgnoredCoords(lat, lng) {
 
 exports.run = async (event) => {
   const classifieds = event.Records.map((row) => JSON.parse(row.body));
-  const eligibleClassifieds = classifieds.filter(
-    (classified) =>
-      (!classified.location_country ||
-        classified.location_country === 'Latvia') &&
-      ['apartment', 'house', 'office'].includes(classified.category),
+  const eligibleClassifieds = classifieds.filter((classified) =>
+    ['apartment', 'house', 'office'].includes(classified.category),
   );
 
   // Link by cadastre_number
@@ -104,12 +101,7 @@ exports.run = async (event) => {
   // Link "land" classifieds by lat/lng
   await Promise.all(
     classifieds
-      .filter(
-        (classified) =>
-          (!classified.location_country ||
-            classified.location_country === 'Latvia') &&
-          classified.category === 'land',
-      )
+      .filter((classified) => classified.category === 'land')
       .filter((classified) => !!classified.lat && !!classified.lng)
       .filter((classified) => !isIgnoredCoords(classified.lat, classified.lng))
       .map(async (classified) => {
