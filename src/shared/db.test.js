@@ -117,3 +117,41 @@ describe('findVzdBuildingIdByLocation', () => {
     expect(output).toBe(333);
   });
 });
+
+describe('findVzdIdByCadastreNumber', () => {
+  afterEach(jest.clearAllMocks);
+
+  describe.each([
+    ['building', 'house'],
+    ['land', 'land'],
+  ])('using %j category', (type, category) => {
+    test('constructs the correct query', () => {
+      db.findVzdIdByCadastreNumber('01000762043', category);
+
+      expect(query).toBeCalled();
+      expect(query.mock.calls[0][0]).toMatchSnapshot();
+    });
+
+    test('returns nothing if nothing found', async () => {
+      query.mockResolvedValueOnce([]);
+
+      const output = await db.findVzdIdByCadastreNumber(
+        '01000762043',
+        category,
+      );
+
+      expect(output).toEqual({});
+    });
+
+    test('returns the row id if something is found', async () => {
+      query.mockResolvedValueOnce([{ id: 333 }]);
+
+      const output = await db.findVzdIdByCadastreNumber(
+        '01000762043',
+        category,
+      );
+
+      expect(output).toEqual({ id: 333, type });
+    });
+  });
+});

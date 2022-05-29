@@ -1,4 +1,5 @@
 const addressParser = require('@brokalys/address-normalization');
+const cadastreNumberNormalizer = require('./shared/cadastre-number-normalizer');
 const db = require('./shared/db');
 
 const IGNORED_COORDINATES = [
@@ -20,6 +21,37 @@ exports.run = async (event) => {
       (!classified.location_country ||
         classified.location_country === 'Latvia') &&
       ['apartment', 'house', 'office'].includes(classified.category),
+  );
+
+  // Link by cadastre_number
+  await Promise.all(
+    classifieds
+      .filter((classified) => ['house', 'land'].includes(classified.category))
+      .filter((classified) => classified.cadastre_number)
+      .map(async (classified) => {
+        const cadastreNumber = cadastreNumberNormalizer(
+          classified.cadastre_number,
+        );
+
+        if (!cadastreNumber) {
+          return;
+        }
+
+        const { id: estateId, type } = await db.findVzdIdByCadastreNumber(
+          cadastreNumber,
+          classified.category,
+        );
+
+        if (!estateId) {
+          return;
+        }
+
+        if (type === 'land') {
+          return db.createPropertyLandLink(classified.id, estateId, 'cadnum');
+        }
+
+        return db.createPropertyBuildingLink(classified.id, estateId, 'cadnum');
+      }),
   );
 
   // Link by address

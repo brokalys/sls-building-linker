@@ -69,6 +69,38 @@ Object {
 }
 `;
 
+exports[`findVzdIdByCadastreNumber using "building" category constructs the correct query 1`] = `
+Object {
+  "sql": "
+      SELECT id
+      FROM vzd_buildings
+      WHERE is_usable = 1
+        AND cadastral_designation = ?
+      ORDER BY id ASC
+      LIMIT 1
+   ",
+  "values": Array [
+    "01000762043",
+  ],
+}
+`;
+
+exports[`findVzdIdByCadastreNumber using "land" category constructs the correct query 1`] = `
+Object {
+  "sql": "
+      SELECT id
+      FROM vzd_land
+      WHERE is_usable = 1
+        AND cadastral_designation = ?
+      ORDER BY id ASC
+      LIMIT 1
+   ",
+  "values": Array [
+    "01000762043",
+  ],
+}
+`;
+
 exports[`findVzdLandIdByLatLng constructs the correct query 1`] = `
 Object {
   "sql": "

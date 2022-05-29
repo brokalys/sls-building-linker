@@ -6,6 +6,101 @@ jest.mock('./shared/db');
 describe('process-vzd-queue', () => {
   afterEach(jest.clearAllMocks);
 
+  test('creates the building link if a cadastre number match is found for category=house', async () => {
+    db.findVzdIdByCadastreNumber.mockResolvedValueOnce({
+      id: 111,
+      type: 'building',
+    });
+
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'house',
+            cadastre_number: '8092 001 0518',
+          }),
+        },
+      ],
+    });
+
+    expect(db.findVzdIdByCadastreNumber).toBeCalledWith('80920010518', 'house');
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(1);
+    expect(db.createPropertyLandLink).toBeCalledTimes(0);
+  });
+
+  test('creates the land link if a cadastre number match is found for category=land', async () => {
+    db.findVzdIdByCadastreNumber.mockResolvedValueOnce({
+      id: 111,
+      type: 'land',
+    });
+
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'land',
+            cadastre_number: '8092 001 0518',
+          }),
+        },
+      ],
+    });
+
+    expect(db.findVzdIdByCadastreNumber).toBeCalledWith('80920010518', 'land');
+    expect(db.createPropertyLandLink).toBeCalledTimes(1);
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(0);
+  });
+
+  test('ignores properties that return no cadastre-number match', async () => {
+    db.findVzdIdByCadastreNumber.mockResolvedValueOnce({});
+
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'land',
+            cadastre_number: '8092 001 0518',
+          }),
+        },
+      ],
+    });
+
+    expect(db.findVzdIdByCadastreNumber).toBeCalledWith('80920010518', 'land');
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(0);
+    expect(db.createPropertyLandLink).toBeCalledTimes(0);
+  });
+
+  test('ignores properties with no cadastre_number field', async () => {
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'house',
+            cadastre_number: null,
+          }),
+        },
+      ],
+    });
+
+    expect(db.findVzdIdByCadastreNumber).not.toBeCalled();
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(0);
+  });
+
+  test('ignores properties with invalid cadastre_number field', async () => {
+    await run({
+      Records: [
+        {
+          body: JSON.stringify({
+            category: 'house',
+            cadastre_number: 'totally invalid',
+          }),
+        },
+      ],
+    });
+
+    expect(db.findVzdIdByCadastreNumber).not.toBeCalled();
+    expect(db.createPropertyBuildingLink).toBeCalledTimes(0);
+  });
+
   test('creates the building id if a address match is found', async () => {
     db.findVzdBuildingIdByLocation.mockResolvedValueOnce(111);
 

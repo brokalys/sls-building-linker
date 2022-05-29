@@ -111,10 +111,33 @@ async function findVzdBuildingIdByLocation({ city, street, housenumber }) {
   }
 }
 
+async function findVzdIdByCadastreNumber(cadastreNumber, type) {
+  const useBuildingsTable = type === 'house';
+
+  const data = await mysql.query({
+    sql: `
+      SELECT id
+      FROM ${useBuildingsTable ? 'vzd_buildings' : 'vzd_land'}
+      WHERE is_usable = 1
+        AND cadastral_designation = ?
+      ORDER BY id ASC
+      LIMIT 1
+   `,
+    values: [cadastreNumber],
+  });
+
+  if (data.length > 0) {
+    return { id: data[0].id, type: useBuildingsTable ? 'building' : 'land' };
+  }
+
+  return {};
+}
+
 module.exports = {
   createPropertyBuildingLink,
   createPropertyLandLink,
   findVzdLandIdByLatLng,
   findVzdBuildingIdByLatLng,
   findVzdBuildingIdByLocation,
+  findVzdIdByCadastreNumber,
 };
